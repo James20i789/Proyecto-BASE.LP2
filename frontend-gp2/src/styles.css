@@ -1,0 +1,50 @@
+/* You can add global styles to this file, and also import other style files */
+
+:root {
+  --color-primario: #003A6C; 
+  --color-acento: #FDB913;   
+  --color-texto-claro: #FFFFFF;
+  
+  --color-texto-oscuro: #333333; 
+  --color-fondo-claro: #f8f9fa; 
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--color-fondo-claro); 
+  color: var(--color-texto-oscuro); 
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex-grow: 1;
+  padding: 20px 40px;
+}
+
+
+.bg-upeu-primary {
+  background-color: var(--color-primario) !important;
+}
+
+.text-upeu-accent {
+  color: var(--color-acento) !important;
+}
+
+.btn-outline-accent {
+  --bs-btn-color: var(--color-acento);
+  --bs-btn-border-color: var(--color-acento);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--color-acento);
+  --bs-btn-hover-border-color: var(--color-acento);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--color-acento);
+  --bs-btn-active-border-color: var(--color-acento);
+  --bs-btn-disabled-color: var(--color-acento);
+  --bs-btn-disabled-bg: transparent;
+}

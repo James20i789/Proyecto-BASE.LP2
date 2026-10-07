@@ -1,0 +1,13 @@
+{
+    "/api":{
+        "_comment":"CONEXIONES CON EL BACKEND",
+        "target": "http://localhost:8082/lp2_gp2", 
+        "secure": false,
+        "logLevel": "debug"
+    },
+    "/lp2_gp2/images":{
+        "target": "http://localhost:8082", 
+        "secure": false,
+        "logLevel": "debug"
+    }
+}

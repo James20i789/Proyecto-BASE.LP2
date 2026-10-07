@@ -1,0 +1,44 @@
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: var(--color-primario); /* <- Usando la variable */
+  color: var(--color-texto-claro);       /* <- Usando la variable */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.logo a {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-texto-claro);
+  text-decoration: none;
+}
+
+.main-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+.main-nav a {
+  color: rgba(255, 255, 255, 0.8); /* Un blanco semitransparente para enlaces no activos */
+  text-decoration: none;
+  font-size: 16px;
+  padding-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.main-nav a:hover {
+  color: var(--color-texto-claro);
+}
+
+/* El enlace activo usará el color de acento */
+.active-link {
+  color: var(--color-texto-claro);
+  font-weight: bold;
+  border-bottom: 3px solid var(--color-acento); /* <- Usando la variable */
+}
