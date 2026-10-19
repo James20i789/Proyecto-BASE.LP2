@@ -10,7 +10,7 @@
                     <h5 class="card-title">{{prod.nombre}}</h5>
                     <p class="card-text text-muted">{{prod.descripcion}}</p>
                     <h4 class="text-upeu-primary">Precio: S/.{{prod.precio}}</h4>
-                    <button class="btn btn-outline-accent w-100">Agregar al Carrito</button>
+                    <button class="btn btn-outline-accent w-100" (click)="agregarAlCarrito(prod)">Agregar al Carrito</button>
                 </div>
             </div>
 
