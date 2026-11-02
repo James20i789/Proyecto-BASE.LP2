@@ -1,5 +1,6 @@
 package pe.edu.upeu.lp2_gp2.services;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upeu.lp2_gp2.dto.RegistroDTO;
@@ -18,11 +19,14 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     private final PersonaRepository personaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioServiceImpl(PersonaRepository personaRepository, UsuarioRepository usuarioRepository) {
+    public UsuarioServiceImpl(PersonaRepository personaRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.personaRepository = personaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
 
     // DATOS TRANSACTIONALS
     @Override
@@ -38,19 +42,20 @@ public class UsuarioServiceImpl implements IUsuarioService{
             throw new DuplicateResourceException("EL NOMBRE DEL USUARIO´" + dto.usuario() + "´YA EXISTE");
         }
         // SI TODO VA BIEN, PROCEDEMOS A ENVIAR LOS DATOS
-        Persona p = new Persona(); // INSTANCIA - Clase Persona
+        Persona p = new Persona();
         p.setNombre(dto.nombre());
         p.setEmail(dto.email());
         p.setTelefono(dto.telefono());
         p.setDireccion(dto.direccion());
-        Persona personaGuarda = personaRepository.save(p);
+        Persona personaGuardada = personaRepository.save(p);
 
-        Usuario u = new Usuario(); // INSTANCIA - Clase Usuario
+        Usuario u = new Usuario();
         u.setUsuario(dto.usuario());
-
-        u.setPassword(dto.password());
+        // Encriptamos la clave con spring security passwordEncoder
+        String passwordEncriptado = passwordEncoder.encode(dto.password());
+        u.setPassword(passwordEncriptado);
         u.setRol(Rol.CLIENTE);
-        u.setPersona(personaGuarda);
+        u.setPersona(personaGuardada);
 
         // USUARIO GUARDADO - REPOSITORY
         Usuario usuarioGuardado = usuarioRepository.save(u);
