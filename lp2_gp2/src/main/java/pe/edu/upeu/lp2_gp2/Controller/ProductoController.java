@@ -96,7 +96,7 @@ public class ProductoController {
         ProductoDTO dtoParaActualizar = new ProductoDTO(
                 id, dto.nombre(), dto.descripcion(), dto.precio(), dto.stock(), nombreImagen
         );
-
+        // PRODUCTO SERVICE - DTO.ACTUALIZAR
         return productoService.actualizar(id, dtoParaActualizar)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResouceNotFoundException("Error al actualizar"));
