@@ -21,6 +21,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
+        // PROCESS MAPPING | HASH256 POR TIEMPO
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
@@ -28,6 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         body.put("message", "Token faltante, inválido o expirado. Por favor, inicia sesión.");
         body.put("path", request.getRequestURI());
 
+        // NUEVO OBJETO MAPPEADO  + RESPUESTA DE ESCRITURA VALIDADA
         new ObjectMapper().writeValue(response.getOutputStream(), body);
 
     }

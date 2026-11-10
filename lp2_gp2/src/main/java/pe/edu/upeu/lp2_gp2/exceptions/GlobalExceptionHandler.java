@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     // 2. Manejar errores de validación (400 Bad Request)
-    // Esto atrapa los errores de @Valid en tus DTOs
+    // Esto atrapa los errores de @Valid en tus DTOs - VALIDAR MÉTODOS
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -45,6 +45,7 @@ public class GlobalExceptionHandler {
     }
 
     // 3. Manejar cualquier otro error inesperado (500 Internal Server Error)
+    // EXCEPTION.HANDLER - ENTITY | CLASES GLOBALES
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGlobalException(Exception ex) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -55,6 +56,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    // EXCEPTION.HANDLER - ENTITY | DUPLICAR RECURSOS
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -66,6 +68,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
+    // EXCEPTION.HANDLER - ENTITY | INSUFICIENTE STOCK
     @ExceptionHandler(InsufficienteStockException.class)
     public ResponseEntity<Object> handleInsufficientStock(InsufficienteStockException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -74,6 +77,7 @@ public class GlobalExceptionHandler {
         body.put("error", "Stock Error");
         body.put("message", ex.getMessage());
 
+        // RETORNAR RESPUESTA SEGÚN EL ESTADO DE LA ENTIDAD
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 

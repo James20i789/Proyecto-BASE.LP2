@@ -21,6 +21,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
+        // PROCESS MAPPING | HASH256 POR TIEMPO
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpServletResponse.SC_FORBIDDEN);
@@ -28,6 +29,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         body.put("message", "No tienes permisos suficientes para acceder a este recurso");
         body.put("path", request.getRequestURI());
 
+        // NUEVO OBJETO MAPPEADO  + RESPUESTA DE ESCRITURA VALIDADA
         new ObjectMapper().writeValue(response.getOutputStream(), body);
 
     }

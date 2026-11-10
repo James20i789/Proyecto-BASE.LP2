@@ -17,9 +17,11 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+    // VALIDAR SEGURIDAD POR LA CLAVE SECRETA
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
+    // VALIDAR SEGURIDAD POR EL TIEMPO DE EXPIRACIÓN
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
@@ -57,6 +59,7 @@ public class JwtService {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
+    // CLASE PRIVADA |  TOKEN.EXPIRADA
     private boolean isTokenExpired (String token){
         return extractExpiration(token).before(new Date());
     }
@@ -64,6 +67,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    // CLASE PRIVADA | EXTRACCIÓN COMPLETA - TOKENS
     private Claims extractAllClaims(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -72,6 +76,7 @@ public class JwtService {
                 .getBody();
     }
 
+    // CLASE.CLAVE - INGRESO DE SEGURIDAD
     private Key getSignInKey(){
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);

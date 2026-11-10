@@ -25,7 +25,7 @@ public class ProductoController {
         this.fileStorageService = fileStorageService;
     }
 
-    //listar productos
+    // LISTAR PRODUCTOS | GET MAPPING
     @GetMapping
     public ResponseEntity<List<ProductoDTO>> listar(){
         return ResponseEntity.ok(productoService.ListarTodo());
@@ -75,6 +75,7 @@ public class ProductoController {
 
     }*/
 
+    // VALIDAR | PROCESS MAPPING - ACTUALIZAR.PRODUCTO
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ProductoDTO> actualizar(
             @PathVariable Long id,
@@ -101,6 +102,7 @@ public class ProductoController {
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResouceNotFoundException("Error al actualizar"));
     }
+    // ELEMINAR | PROCCES MAPPING - VIA ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id){
         if (productoService.eliminar(id)){
