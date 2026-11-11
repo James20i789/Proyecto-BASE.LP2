@@ -51,6 +51,7 @@ public class SecurityConfig {
                         . authenticationEntryPoint(authenticationEntryPoint) // MANEJA EL ERROR 401
                         .accessDeniedHandler(accessDeniedHandler) // MANEJA EL ERROR 403
                 );
+        // RETORNA LA CONTRUSCCIÓN DE LA WEB
         return http.build();
     }
 }

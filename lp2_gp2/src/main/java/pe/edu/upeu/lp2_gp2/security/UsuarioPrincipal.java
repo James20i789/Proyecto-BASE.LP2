@@ -23,7 +23,7 @@ public record UsuarioPrincipal(Usuario usuario) implements UserDetails {
     public String getUsername() {
         return usuario.getUsuario();
     }
-
+    // Metodo | IS ACCOUNT NO EXPIRABLE - VALOR VERDADERO
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -34,11 +34,12 @@ public record UsuarioPrincipal(Usuario usuario) implements UserDetails {
         return true;
     }
 
+    // Metodo Credencial | NO EXPIRADA
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
+    // Metodo Enable | BOOLEAN - RETORNO DE VALOR VERDADERO
     @Override
     public boolean isEnabled() {
         return true;

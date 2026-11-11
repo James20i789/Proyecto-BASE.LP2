@@ -41,6 +41,7 @@ public class GlobalExceptionHandler {
         );
         body.put("errors", errors);
 
+        // RETORNA LA RESPUESTA DE LA ENTIDAD
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 

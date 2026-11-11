@@ -17,10 +17,12 @@ import java.util.Optional;
 @Service
 public class UsuarioServiceImpl implements IUsuarioService{
 
+    // CLASE PRIVADAS FINALES PARA UNA VERIDICA CONEXIÓN.
     private final PersonaRepository personaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // USUARIO | IMPLEMENTACIÓN - SERVICIOS
     public UsuarioServiceImpl(PersonaRepository personaRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.personaRepository = personaRepository;
         this.usuarioRepository = usuarioRepository;
@@ -41,7 +43,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
         if(usuarioRepository.existsByUsuario(dto.usuario())){
             throw new DuplicateResourceException("EL NOMBRE DEL USUARIO´" + dto.usuario() + "´YA EXISTE");
         }
-        // SI TODO VA BIEN, PROCEDEMOS A ENVIAR LOS DATOS
+        // Envío de datos | PROCESO CORRECTO
         Persona p = new Persona();
         p.setNombre(dto.nombre());
         p.setEmail(dto.email());
