@@ -10,7 +10,7 @@ import { ItemVentaDTO, VentaDTO } from '../../core/Interfaces/pedido.interface';
   imports: [RouterLink],
   templateUrl: './carrito.component.html',
   styleUrl: './carrito.component.css'
-})
+}) // CLASE EXPORTADA | CARRITO COMPONENT
 export class CarritoComponent {
 public cartService = inject(CartService);
   

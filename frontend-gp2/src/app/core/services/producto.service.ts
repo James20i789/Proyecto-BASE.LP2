@@ -39,9 +39,11 @@ export class ProductoService {
     updateProducto(id:number, formData: FormData): Observable<Producto> {
       // DATOS A INSERTAR POR CONSOLA - VIA PUT
       console.log("Form Data a recibir en el servicio: UPDATE PRODUCTO");
+      // CONSOLE LOG DEL ID DEL PRODUCTO A ACTUALIZAR
       formData.forEach((value, key) => {
         console.log(`${key}: ${value}`);
       });
+      // CONSOLE LOG DEL ID DEL PRODUCTO A ACTUALIZAR
       return this.http.put<Producto>(`${this.apiUrl}/${id}`, formData);
     }
     // METODOS PARA EL ADMINISTRADOR (DELETE-PRODUCTO)
