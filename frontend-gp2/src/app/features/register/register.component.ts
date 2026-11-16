@@ -35,6 +35,7 @@ export class RegisterComponent {
     this.authService.registrar(this.userData)
     .pipe(finalize(() => this.isloading = false)) // Finalizar la carga después de la respuesta
     .subscribe({
+      // Manejar la respuesta del registro
       next: () => {
         // (1) CERRAR EL MODAL DE REGISTRO
         document.getElementById('CloseRegisterModal')?.click(); // Cerrar el modal de registro
