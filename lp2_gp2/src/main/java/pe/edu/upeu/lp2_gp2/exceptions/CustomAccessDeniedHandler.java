@@ -18,7 +18,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
             throws IOException {
-        // CONTENIDO DE ESCRITURA
+        // CONTENIDO DE ESCRITURA + ESTADOS
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
@@ -32,6 +32,5 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         // NUEVO OBJETO MAPPEADO  + RESPUESTA DE ESCRITURA VALIDADA
         new ObjectMapper().writeValue(response.getOutputStream(), body);
-
     }
 }

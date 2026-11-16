@@ -23,6 +23,7 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.authService.isLoggedIn$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
+        // Recuperar el nombre de usuario y el rol del usuario desde localStorage
         this.userName = localStorage.getItem('user_name') || 'Usuario';
         this.isAdmin = localStorage.getItem('user_role') === 'ADMIN';
       } else {
