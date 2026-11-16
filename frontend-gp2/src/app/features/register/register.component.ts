@@ -41,7 +41,28 @@ export class RegisterComponent {
         document.getElementById('CloseRegisterModal')?.click(); // Cerrar el modal de registro
         // (2) MOSTRAR MENSAJE DE ÉXITO - ALERTA
         this.alertService.success('¡Registro exitoso! Ahora puedes iniciar sesión.', 'success'); // Mostrar mensaje de éxito
-      }
-    })
-}
+      // (3) ABRIR EL MODAL DE INICIO DE SESIÓN DESPUÉS DE UN BREVE RETRASO
+        setTimeout(() => {
+            const btnLogin = document.querySelector('[data-bs-target="#loginModal"]') as HTMLElement;
+            btnLogin?.click;
+          }, 600);
+          this.resetForm();
+        }, error: (err) => {
+          this.alertService.error(err.error.message || 'Error al registrarse');
+        }
+      })
+
+  }
+
+  resetForm() {
+    this.userData = {
+      nombre: '',
+      email: '',
+      telefono: '',
+      direccion: '',
+      usuario: '',
+      password: '',
+    }
+  }
+
 }

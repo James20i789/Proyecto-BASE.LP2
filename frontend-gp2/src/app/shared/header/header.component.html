@@ -14,6 +14,7 @@
         </li>
 
         <!-- MENÚ GESTIÓN: Solo visible para ADMIN -->
+        @if (isAdmin) {
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Gestión
@@ -22,7 +23,9 @@
             <li><a class="dropdown-item" routerLink="/productos">Productos</a></li>
             <li><a class="dropdown-item" routerLink="/reportes">Reportes</a></li>
          </ul>
-        </ul>
+        </li>
+        }
+          </ul>
 
       <!-- Buscador -->
       <form class="d-flex me-3" role="search">
@@ -44,14 +47,18 @@
       <!-- SECCIÓN DE AUTENTICACIÓN -->
        <!---->
         <div class="d-flex align-items-center ms-lg-3">
+          @if (!(authService.isLoggedIn$ | async)) {
             <!-- Botón que activa el Modal -->
             <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#loginModal">
             Ingresar
             </button>
+          }@else{
             <span class="text-white me-3">Hola, <strong> Anita Rojas</strong></span>
-            <button class="btn btn-danger btn-sm">Cerrar Sesión</button>
+            <button class="btn btn-danger btn-sm" (click)="logout()">Cerrar Sesión</button>
+          }
         </div>
+        <app-login></app-login>
+        <app-register></app-register>
+      </div>
   </div>
-  </div>
-
-  </nav>
+</nav>
