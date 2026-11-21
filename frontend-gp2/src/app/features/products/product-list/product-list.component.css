@@ -1,0 +1,9 @@
+.admin-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; }
+.admin-heading h1 { margin: 0; }
+.admin-table { overflow-x: auto; }
+.admin-table table { width: 100%; min-width: 560px; border-collapse: collapse; text-align: left; }
+.admin-table th, .admin-table td { padding: .8rem 1rem; border-bottom: 1px solid var(--line); }
+.admin-table tr:last-child td { border-bottom: 0; }
+.admin-table th { background: #f5e9df; }
+.admin-product, .admin-actions { display: flex; align-items: center; gap: .6rem; }
+.admin-product img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; }

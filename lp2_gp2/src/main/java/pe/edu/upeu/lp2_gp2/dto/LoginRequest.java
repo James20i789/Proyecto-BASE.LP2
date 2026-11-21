@@ -1,11 +1,10 @@
 package pe.edu.upeu.lp2_gp2.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record LoginRequest(
-        @NotBlank(message = "EL USER ES OBLIGATORIO")
-        String usuario,
-        @NotBlank(message = "LA CONTRASEÑA ES OBLIGATORIA")
-        String password
+        @NotBlank @Size(max = 255) String usuario,
+        @NotBlank @Size(max = 255) String password
 ) {
 }

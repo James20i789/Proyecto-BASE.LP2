@@ -26,7 +26,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         body.put("timestamp", LocalDateTime.now().toString());
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         body.put("error", "Unauthorized");
-        body.put("message", "Token faltante, inválido o expirado. Por favor, inicia sesión.");
+        body.put("message", "Inicia sesión para continuar.");
         body.put("path", request.getRequestURI());
 
         // NUEVO OBJETO MAPPEADO  + RESPUESTA DE ESCRITURA VALIDADA

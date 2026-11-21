@@ -1,0 +1,21 @@
+.home-hero { display: grid; grid-template-columns: 1fr 1.04fr; min-height: 420px; margin-top: 2.1rem; border-radius: 26px; overflow: hidden; background: #f5e7da; }
+.hero-copy { align-self: center; padding: clamp(2rem, 5vw, 4.4rem); }
+.hero-copy h1 { font-size: clamp(2.7rem, 5.65vw, 5.4rem); letter-spacing: -.065em; line-height: .98; margin: 0; }
+.hero-copy h1 em { color: var(--brand); font-weight: inherit; }
+.hero-description { margin: 1.35rem 0 1.65rem; max-width: 26rem; color: #675448; font-size: 1.08rem; }
+.hero-media { min-width: 0; position: relative; min-height: 260px; background: #44271b; }
+.hero-media img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 54% 50%; }
+.menu { padding-top: 3.2rem; padding-bottom: 1rem; scroll-margin-top: 1rem; }
+.section-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1.5rem; }
+.section-heading h2 { font-size: clamp(2rem, 4vw, 3.15rem); margin: 0; }
+.section-heading p { color: var(--muted); margin: .4rem 0 0; }
+.menu-search { display: flex; align-items: center; gap: .7rem; background: var(--surface); border: 1px solid var(--line); padding: .6rem .9rem; border-radius: 11px; }
+.menu-search input { min-width: 0; width: 100%; background: transparent; border: 0; color: var(--ink); }
+.menu-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.35rem; }
+.menu-card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); overflow: hidden; border-radius: 16px; }
+.product-media { position: relative; background: #ead8c8; aspect-ratio: 1.65; }
+.product-media img { width: 100%; height: 100%; object-fit: cover; }
+.product-copy h3 { font: 750 1.15rem var(--sans); margin: 0 0 .35rem; }
+.product-bottom strong { color: var(--brand); font-size: 1.15rem; }
+@media (max-width: 800px) { .home-hero { grid-template-columns: 1fr 1fr; min-height: 360px; } .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 580px) { .home-hero { grid-template-columns: 1fr; margin-top: 1rem; } .hero-media { min-height: 220px; } .menu { padding-top: 2rem; } .menu-grid { grid-template-columns: 1fr; } .menu-search { width: 100%; } }

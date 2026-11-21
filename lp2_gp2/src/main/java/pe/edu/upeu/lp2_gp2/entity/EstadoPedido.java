@@ -1,0 +1,5 @@
+package pe.edu.upeu.lp2_gp2.entity;
+
+public enum EstadoPedido {
+    PENDIENTE, PAGADO, VENCIDO, REEMBOLSO_PENDIENTE, REEMBOLSADO, REEMBOLSO_PARCIAL, CONTRACARGO
+}

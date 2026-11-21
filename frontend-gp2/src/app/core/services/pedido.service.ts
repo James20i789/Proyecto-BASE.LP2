@@ -1,21 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { VentaDTO } from '../Interfaces/pedido.interface';
-import { Observable } from 'rxjs';
+import { API } from '../api';
+import { Pedido, VentaDTO } from '../Interfaces/pedido.interface';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PedidoService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
+  private readonly url = `${API}/pedidos`;
 
-  // API URL for pedido endpoints
-  private apiUrl = '/api/v1/pedidos'; // RUTA DEL PROXY
-
-  // CREAR PEDIDOS - PROCESO DE RUTA (VENTA)
-  crearPedido(pedido: VentaDTO): Observable<any> {
-    return this.http.post(this.apiUrl, pedido);
+  crearPedido(pedido: VentaDTO) {
+    return this.http.post<Pedido>(this.url, pedido);
   }
 
-  
+  get(id: number) {
+    return this.http.get<Pedido>(`${this.url}/${id}`);
+  }
+
+  list() {
+    return this.http.get<Pedido[]>(this.url);
+  }
 }

@@ -11,7 +11,7 @@ export class AlertService {
       title: title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#003A6C', // Color primario UPeU
+      confirmButtonColor: '#a53622', // Color primario UPeU
     });
   }
 
@@ -32,7 +32,7 @@ export class AlertService {
       text: message,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#003A6C',
+      confirmButtonColor: '#a53622',
       cancelButtonColor: '#dc3545',
       confirmButtonText: 'Sí, continuar',
       cancelButtonText: 'Cancelar'
@@ -41,7 +41,7 @@ export class AlertService {
   }
 
   // Notificación tipo Toast (Esquina superior)
-  toast(message: string, icon: 'success' | 'error' | 'info' = 'success') {
+  toast(message: string, icon: 'success' | 'error' | 'info' | 'warning' = 'success') {
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',

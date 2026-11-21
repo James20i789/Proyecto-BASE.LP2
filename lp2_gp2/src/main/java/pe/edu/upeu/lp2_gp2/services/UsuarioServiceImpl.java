@@ -12,7 +12,11 @@ import pe.edu.upeu.lp2_gp2.exceptions.DuplicateResourceException;
 import pe.edu.upeu.lp2_gp2.repository.PersonaRepository;
 import pe.edu.upeu.lp2_gp2.repository.UsuarioRepository;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsuarioServiceImpl implements IUsuarioService{
@@ -35,24 +39,25 @@ public class UsuarioServiceImpl implements IUsuarioService{
     @Transactional // UsuarioDTO | REGISTRAR CLIENTE
     public Optional<UsuarioDTO> registrarCliente(RegistroDTO dto) {
 
-        // VALIDAR QUE EL EMAIL SEA ÚNICO
-        if(personaRepository.existsByEmail(dto.email())){
-            throw new DuplicateResourceException("EL EMAIL´" + dto.email() + "´YA ESTA REGISTRADO");
+        String email = dto.email().strip().toLowerCase(Locale.ROOT);
+        if (dto.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña supera los 72 bytes.");
         }
-        // VALIDAR QUE EL USUARIO SEA ÚNICO
-        if(usuarioRepository.existsByUsuario(dto.usuario())){
-            throw new DuplicateResourceException("EL NOMBRE DEL USUARIO´" + dto.usuario() + "´YA EXISTE");
+        if (personaRepository.existsByEmailIgnoreCase(email) || usuarioRepository.existsByUsuario(dto.usuario())) {
+            throw new DuplicateResourceException("El usuario o correo ya está registrado.");
         }
+
         // Envío de datos | PROCESO CORRECTO
         Persona p = new Persona();
-        p.setNombre(dto.nombre());
-        p.setEmail(dto.email());
+        p.setNombre(dto.nombre().strip());
+        p.setEmail(email);
         p.setTelefono(dto.telefono());
         p.setDireccion(dto.direccion());
         Persona personaGuardada = personaRepository.save(p);
 
         Usuario u = new Usuario();
         u.setUsuario(dto.usuario());
+        u.setNombre(dto.usuario());
         // Encriptamos la clave con spring security passwordEncoder
         String passwordEncriptado = passwordEncoder.encode(dto.password());
         u.setPassword(passwordEncriptado);

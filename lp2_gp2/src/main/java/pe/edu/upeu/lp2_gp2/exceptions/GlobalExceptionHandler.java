@@ -1,87 +1,78 @@
 package pe.edu.upeu.lp2_gp2.exceptions;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    // 1. Manejar nuestra excepción personalizada (404 Not Found)
-    @ExceptionHandler(ResouceNotFoundException.class)
-    public ResponseEntity<Object> handleResourceNotFound(ResouceNotFoundException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
-
-    // 2. Manejar errores de validación (400 Bad Request)
-    // Esto atrapa los errores de @Valid en tus DTOs - VALIDAR MÉTODOS
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-
-        // Recolectamos todos los errores de los campos
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<?> validation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
-        body.put("errors", errors);
-
-        // RETORNA LA RESPUESTA DE LA ENTIDAD
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+                errors.putIfAbsent(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(Map.of(
+                "message", "Revisa los campos enviados.", "errors", errors));
     }
 
-    // 3. Manejar cualquier otro error inesperado (500 Internal Server Error)
-    // EXCEPTION.HANDLER - ENTITY | CLASES GLOBALES
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleGlobalException(Exception ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("message", "Ocurrió un error interno en el servidor");
-        body.put("details", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    // EXCEPTION.HANDLER - ENTITY | DUPLICAR RECURSOS
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Conflict");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    @ExceptionHandler({BadCredentialsException.class, AccountStatusException.class})
+    public ResponseEntity<?> authentication() {
+        return message(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos.");
     }
 
-    // EXCEPTION.HANDLER - ENTITY | INSUFICIENTE STOCK
+    @ExceptionHandler({DuplicateResourceException.class, DataIntegrityViolationException.class})
+    public ResponseEntity<?> conflict() {
+        return message(HttpStatus.CONFLICT, "La operación entra en conflicto con un registro existente.");
+    }
+
     @ExceptionHandler(InsufficienteStockException.class)
-    public ResponseEntity<Object> handleInsufficientStock(InsufficienteStockException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Stock Error");
-        body.put("message", ex.getMessage());
-
-        // RETORNAR RESPUESTA SEGÚN EL ESTADO DE LA ENTIDAD
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> stock(InsufficienteStockException ex) {
+        return message(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(ResouceNotFoundException.class)
+    public ResponseEntity<?> notFound(ResouceNotFoundException ex) {
+        return message(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> resource() {
+        return message(HttpStatus.NOT_FOUND, "Recurso no encontrado.");
+    }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> invalidBody() {
+        return message(HttpStatus.BAD_REQUEST, "Los datos enviados tienen un formato inválido.");
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<?> status(ResponseStatusException ex) {
+        return message(ex.getStatusCode(), ex.getReason());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> unexpected(Exception ex) {
+        LOG.error("Error inesperado al procesar la solicitud", ex);
+        return message(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error interno.");
+    }
+
+    private ResponseEntity<?> message(HttpStatusCode status, String message) {
+        return ResponseEntity.status(status).body(Map.of(
+                "status", status.value(), "message", message == null ? "Error en la solicitud." : message));
+    }
 }

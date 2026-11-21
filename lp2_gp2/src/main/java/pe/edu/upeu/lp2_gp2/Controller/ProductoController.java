@@ -1,7 +1,7 @@
 package pe.edu.upeu.lp2_gp2.Controller;
 
-
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,106 +12,56 @@ import pe.edu.upeu.lp2_gp2.exceptions.ResouceNotFoundException;
 import pe.edu.upeu.lp2_gp2.services.IFileStorageService;
 import pe.edu.upeu.lp2_gp2.services.IProductoService;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/productos")
 public class ProductoController {
-    private final IProductoService productoService;
-    private final IFileStorageService fileStorageService;
+    private final IProductoService products;
+    private final IFileStorageService files;
 
-    public ProductoController(IProductoService productoService, IFileStorageService fileStorageService) {
-        this.productoService = productoService;
-        this.fileStorageService = fileStorageService;
+    public ProductoController(IProductoService products, IFileStorageService files) {
+        this.products = products;
+        this.files = files;
     }
 
-    // LISTAR PRODUCTOS | GET MAPPING
     @GetMapping
-    public ResponseEntity<List<ProductoDTO>> listar(){
-        return ResponseEntity.ok(productoService.ListarTodo());
+    public List<ProductoDTO> listar() {
+        return products.ListarTodo();
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoDTO> obtener(@PathVariable Long id){
-        return productoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElseThrow(()-> new ResouceNotFoundException("Producto no encontrado con Id:"+id));
+    public ProductoDTO obtener(@PathVariable Long id) {
+        return products.buscarPorId(id).orElseThrow(() -> new ResouceNotFoundException("Producto no encontrado."));
     }
-    //post sin imagen
-    /*
-    @PostMapping
-    public ResponseEntity<ProductoDTO> crear(@Valid @RequestBody ProductoDTO dto){
-        return new ResponseEntity<>(productoService.crear(dto), HttpStatus.CREATED);
-    }*/
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ProductoDTO> crear(
-            @ModelAttribute @org.springdoc.core.annotations.ParameterObject @Valid ProductoDTO dto,  // Cambiado de @RequestPart a @ModelAttribute
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductoDTO> crear(@Valid @ModelAttribute ProductoDTO dto,
             @RequestPart(value = "file", required = false) MultipartFile file) {
-
-        String nombreImagen = "no-image.png";
-        if (file != null && !file.isEmpty()) {
-            nombreImagen = fileStorageService.store(file);
-        }
-
-        // Como los Records son inmutables, creamos uno nuevo con el nombre de la imagen
-        ProductoDTO productoConImagen = new ProductoDTO(
-                null,
-                dto.nombre(),
-                dto.descripcion(),
-                dto.precio(),
-                dto.stock(),
-                nombreImagen
-        );
-
-        return new ResponseEntity<>(productoService.crear(productoConImagen), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(save(null, dto, file));
     }
-    //PUT SIN IMAGENES
-   /*
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductoDTO> obtener(@PathVariable Long id,
-                                               @Valid @RequestBody ProductoDTO dto){
-        return productoService.actualizar(id,dto)
-                .map(ResponseEntity::ok)
-                .orElseThrow(()-> new ResourceNotFoundException("No se pudo actualizar con Id:"+id));
 
-    }*/
-
-    // VALIDAR | PROCESS MAPPING - ACTUALIZAR.PRODUCTO
-    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ProductoDTO> actualizar(
-            @PathVariable Long id,
-            @ModelAttribute @org.springdoc.core.annotations.ParameterObject @Valid ProductoDTO dto,
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ProductoDTO actualizar(@PathVariable Long id, @Valid @ModelAttribute ProductoDTO dto,
             @RequestPart(value = "file", required = false) MultipartFile file) {
-
-        // 1. Obtener el producto actual para saber qué imagen tiene
-        ProductoDTO productoActual = productoService.buscarPorId(id)
-                .orElseThrow(() -> new ResouceNotFoundException("Producto no encontrado"));
-
-        String nombreImagen = productoActual.imagen(); // Por defecto mantenemos la actual
-
-        // 2. Si el usuario subió un nuevo archivo, lo guardamos
-        if (file != null && !file.isEmpty()) {
-            nombreImagen = fileStorageService.store(file);
-        }
-
-        // 3. Creamos el DTO final con el nombre de la imagen (nueva o vieja)
-        ProductoDTO dtoParaActualizar = new ProductoDTO(
-                id, dto.nombre(), dto.descripcion(), dto.precio(), dto.stock(), nombreImagen
-        );
-        // PRODUCTO SERVICE - DTO.ACTUALIZAR
-        return productoService.actualizar(id, dtoParaActualizar)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResouceNotFoundException("Error al actualizar"));
+        return save(id, dto, file);
     }
-    // ELEMINAR | PROCCES MAPPING - VIA ID
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id){
-        if (productoService.eliminar(id)){
-            return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
+        if (!products.eliminar(id)) {
+            throw new ResouceNotFoundException("Producto no encontrado.");
         }
-        throw new ResouceNotFoundException("No se pudo eliminar con Id:"+id);
     }
 
-
-
-
+    private ProductoDTO save(Long id, ProductoDTO dto, MultipartFile file) {
+        String image = file == null || file.isEmpty() ? null : files.store(file);
+        var product = new ProductoDTO(id, dto.nombre(), dto.descripcion(), dto.precio(), dto.stock(), image);
+        try {
+            return id == null ? products.crear(product) : products.actualizar(id, product)
+                    .orElseThrow(() -> new ResouceNotFoundException("Producto no encontrado."));
+        } catch (RuntimeException ex) {
+            files.delete(image);
+            throw ex;
+        }
+    }
 }

@@ -6,23 +6,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegistroDTO(
-
-        // CAMPOS RECORD | ENVIAR DATOS
-        @NotBlank(message = "EL NOMBRE ES OBLIGATORIO") // NO CAMPO VACÍO - BLANCO
-        String nombre,
-        @NotBlank(message = "El EMAIL ES OBLIGATORIO") // NO CAMPO VACÍO - BLANCO
-        @Email(message = "Debe ser un email válido")
-        String email,
-        @NotBlank(message = "EL TELEFONO ES OBLIGATORIO") // NO CAMPO VACÍO - BLANCO
-        @Pattern(regexp = "^9\\d{8}$", message = "EL TELEFONO DEBE TENER 9 DIGITOS Y EMPEZAR CON 9")
-        String telefono,
-        String direccion,
-        @NotBlank(message = "EL USUARIO ES OBLIGATORIO") // NO CAMPO VACÍO - BLANCO
-        @Size(min = 4, max = 20, message = "EL USUARIO DEBE TENER ENTRE 4 Y 20 CARACTERES")
-        String usuario,
-        @NotBlank(message = "LA CONTRASEÑA ES OBLIGATORIO") // NO CAMPO VACÍO - BLANCO
-        @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
-        String password
-
+        @NotBlank @Size(max = 100) String nombre,
+        @NotBlank @Email @Size(max = 254) String email,
+        @NotBlank @Pattern(regexp = "9[0-9]{8}", message = "Ingresa un celular peruano de 9 dígitos") String telefono,
+        @Size(max = 255) String direccion,
+        @NotBlank @Size(min = 4, max = 20)
+        @Pattern(regexp = "[a-zA-Z0-9_.-]+", message = "Usa letras, números, puntos, guiones o guiones bajos") String usuario,
+        @NotBlank @Size(min = 12, max = 72, message = "Usa entre 12 y 72 caracteres") String password
 ) {
 }

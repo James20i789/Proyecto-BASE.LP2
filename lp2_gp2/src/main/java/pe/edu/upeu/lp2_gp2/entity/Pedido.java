@@ -1,94 +1,78 @@
 package pe.edu.upeu.lp2_gp2.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "pedidos")
+@Table(name = "pedidos", uniqueConstraints = @UniqueConstraint(
+        name = "uq_pedido_intento", columnNames = {"id_persona", "clave_compra"}),
+        indexes = @Index(name = "ix_pedido_vencimiento", columnList = "estado, vence_en"))
 public class Pedido {
-
-    @Id // CLASE PEDIDO
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPedido;
 
-    // Muchos pedidos ya tienen - IDPersona
     @ManyToOne
-    @JoinColumn(name="id_persona")
+    @JoinColumn(name = "id_persona")
     private Persona persona;
 
-    // TOTAL | ESTADO
     private BigDecimal total;
-    private String estado;
 
-    // Registro FechaPEDIDOS
-    @Column(name="fecha_pedido")
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado;
+
+    @Column(name = "fecha_pedido")
     private LocalDateTime fechaPedido;
 
-    // MUchos detalles por ArrayList (ARREGLOS)
-    @OneToMany(mappedBy = "pedido",cascade = CascadeType.ALL)
-    private List<DetallePedido> detalle;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private List<DetallePedido> detalle = new ArrayList<>();
 
-    public Pedido() {
-    }
+    @Column(name = "clave_compra", length = 36)
+    private String claveCompra;
 
-    public Pedido(Long idPedido, Persona persona, BigDecimal total, String estado, LocalDateTime fechaPedido, List<DetallePedido> detalle) {
-        this.idPedido = idPedido;
-        this.persona = persona;
-        this.total = total;
-        this.estado = estado;
-        this.fechaPedido = fechaPedido;
-        this.detalle = detalle;
-    }
+    @Column(name = "referencia_pago", length = 36, unique = true)
+    private String referenciaPago;
 
-    public Long getIdPedido() {
-        return idPedido;
-    }
+    @Column(name = "vence_en")
+    private Instant venceEn;
 
-    public void setIdPedido(Long idPedido) {
-        this.idPedido = idPedido;
-    }
+    @Column(name = "preferencia_pago")
+    private String preferenciaPago;
 
-    public Persona getPersona() {
-        return persona;
-    }
+    @Column(name = "checkout_url", length = 1800)
+    private String checkoutUrl;
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
-    }
+    @Column(name = "transaccion_pago", length = 32, unique = true)
+    private String transaccionPago;
 
-    public BigDecimal getTotal() {
-        return total;
-    }
+    @Column(name = "estado_pago", length = 32)
+    private String estadoPago;
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public LocalDateTime getFechaPedido() {
-        return fechaPedido;
-    }
-
-    public void setFechaPedido(LocalDateTime fechaPedido) {
-        this.fechaPedido = fechaPedido;
-    }
-
-    public List<DetallePedido> getDetalle() {
-        return detalle;
-    }
-
-    public void setDetalle(List<DetallePedido> detalle) {
-        this.detalle = detalle;
-    }
+    public Long getIdPedido() { return idPedido; }
+    public Persona getPersona() { return persona; }
+    public void setPersona(Persona persona) { this.persona = persona; }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
+    public EstadoPedido getEstado() { return estado; }
+    public void setEstado(EstadoPedido estado) { this.estado = estado; }
+    public LocalDateTime getFechaPedido() { return fechaPedido; }
+    public void setFechaPedido(LocalDateTime fechaPedido) { this.fechaPedido = fechaPedido; }
+    public List<DetallePedido> getDetalle() { return detalle; }
+    public void setClaveCompra(String claveCompra) { this.claveCompra = claveCompra; }
+    public String getReferenciaPago() { return referenciaPago; }
+    public void setReferenciaPago(String referenciaPago) { this.referenciaPago = referenciaPago; }
+    public Instant getVenceEn() { return venceEn; }
+    public void setVenceEn(Instant venceEn) { this.venceEn = venceEn; }
+    public String getPreferenciaPago() { return preferenciaPago; }
+    public void setPreferenciaPago(String preferenciaPago) { this.preferenciaPago = preferenciaPago; }
+    public String getCheckoutUrl() { return checkoutUrl; }
+    public void setCheckoutUrl(String checkoutUrl) { this.checkoutUrl = checkoutUrl; }
+    public String getTransaccionPago() { return transaccionPago; }
+    public void setTransaccionPago(String transaccionPago) { this.transaccionPago = transaccionPago; }
+    public String getEstadoPago() { return estadoPago; }
+    public void setEstadoPago(String estadoPago) { this.estadoPago = estadoPago; }
 }
-

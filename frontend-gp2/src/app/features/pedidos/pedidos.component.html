@@ -1,0 +1,30 @@
+<section class="site-width page-section order-page">
+  <h1 class="page-title">Mis pedidos</h1>
+  @if (error()) {
+    <div class="panel empty-state" role="alert">
+      <p>No pudimos cargar tus pedidos.</p>
+      <button class="action secondary" type="button" (click)="load()">Volver a intentar</button>
+    </div>
+  } @else if (data() !== null) {
+    @if (!data()?.length) {
+      <div class="panel empty-state">
+        <h2>Aún no tienes pedidos</h2>
+        <p>Cuando hagas un pedido aparecerá aquí.</p>
+        <a class="action primary" routerLink="/home" fragment="carta">Ver la carta</a>
+      </div>
+    } @else {
+      <ul class="panel order-list">
+        @for (order of data() ?? []; track order.idPedido) {
+          <li>
+            <div><a [routerLink]="['/pedido', order.idPedido]">Pedido #{{ order.idPedido }}</a>
+              <small>{{ order.fecha + 'Z' | date:'dd/MM/yyyy, HH:mm':'-0500' }}</small></div>
+            <span class="state-pill" [class.paid]="order.estado === 'PAGADO'">{{ labels[order.estado] }}</span>
+            <strong>{{ order.total | currency:'PEN':'S/ ' }}</strong>
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <div class="panel empty-state" role="status">Cargando tus pedidos…</div>
+  }
+</section>

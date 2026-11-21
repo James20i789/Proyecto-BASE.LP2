@@ -1,20 +1,66 @@
-<div class = "container mt-4">
-    <h2 class = "text-upeu-primary mb-4"> NUESTRO CATALOGO DE PRODUCTOS</h2>
-    <div class="row">
-        @for(prod of productos; track prod.id){
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img [src]="prod.imagen" class="card-img-top" alt="{{prod.nombre}}"
-                style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">{{prod.nombre}}</h5>
-                    <p class="card-text text-muted">{{prod.descripcion}}</p>
-                    <h4 class="text-upeu-primary">Precio: S/.{{prod.precio}}</h4>
-                    <button class="btn btn-outline-accent w-100" (click)="agregarAlCarrito(prod)">Agregar al Carrito</button>
-                </div>
-            </div>
+<section class="site-width home-hero" aria-labelledby="hero-heading">
+  <div class="hero-copy">
+    <p class="eyebrow"><i class="bi bi-fire" aria-hidden="true"></i> Cocina peruana</p>
+    <h1 id="hero-heading">Sabor peruano<br><em>en cada plato.</em></h1>
+    <p class="hero-description">Pachamanca, ceviche y otros clásicos de nuestra cocina. Elige tus favoritos y arma tu pedido.</p>
+    <a class="action primary" routerLink="/home" fragment="carta"><i class="bi bi-journal-text" aria-hidden="true"></i> Ver la carta</a>
+  </div>
+  <div class="hero-media">
+    <img src="/images/lomo-saltado.webp" alt="Lomo saltado peruano con arroz y papas doradas" width="1280" height="853" fetchpriority="high">
+  </div>
+</section>
 
-        </div>
-        }
+<section id="carta" class="site-width menu" aria-labelledby="menu-heading">
+  <div class="section-heading">
+    <div>
+      <h2 id="menu-heading">Nuestra carta</h2>
+      @if (!loading() && !failed() && products().length) {
+        <p>{{ products().length }} {{ products().length === 1 ? 'plato' : 'platos' }} en la carta</p>
+      }
     </div>
-</div>
+    <label class="menu-search">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input type="search" aria-label="Buscar un plato" placeholder="Busca un plato" [value]="query()" (input)="query.set($any($event.target).value)">
+    </label>
+  </div>
+
+  @if (loading()) {
+    <div class="panel empty-state" role="status">Cargando la carta…</div>
+  } @else if (failed()) {
+    <div class="panel empty-state" role="alert">
+      <p>No pudimos cargar la carta.</p>
+      <button class="action secondary" type="button" (click)="load()">Volver a intentar</button>
+    </div>
+  } @else if (!filtered().length) {
+    <div class="panel empty-state" role="status">
+      <p>{{ query() ? 'No encontramos platos con esa búsqueda.' : 'La carta se está actualizando. Vuelve pronto.' }}</p>
+      @if (query()) {
+        <button class="action secondary" type="button" (click)="query.set('')">Ver todos los platos</button>
+      }
+    </div>
+  } @else {
+    <div class="menu-grid">
+      @for (product of filtered(); track product.id) {
+        <article class="menu-card">
+          <div class="product-media">
+            @if (product.imagen) {
+              <img [src]="product.imagen" alt="" loading="lazy" (error)="$any($event.target).hidden = true">
+            }
+            @if (!product.stock) { <span class="availability">Agotado</span> }
+          </div>
+          <div class="product-copy">
+            <h3>{{ product.nombre }}</h3>
+            <p>{{ product.descripcion }}</p>
+            <div class="product-bottom">
+              <strong>{{ product.precio | currency:'PEN':'S/ ' }}</strong>
+              <button class="action secondary" type="button" [disabled]="!product.stock"
+                [attr.aria-label]="'Añadir ' + product.nombre + ' al carrito'" (click)="cart.agregarProducto(product)">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> Añadir
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
