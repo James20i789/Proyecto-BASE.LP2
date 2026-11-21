@@ -1,58 +1,52 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
-import { ILoginResponse } from '../Interfaces/auth.interface';
+import { inject, Injectable, signal } from '@angular/core';
+import { catchError, Observable, of, switchMap, tap } from 'rxjs';
+import { API } from '../api';
+import { Account, Registration } from '../Interfaces/auth.interface';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  
-  // API URL for authentication endpoints
-  private apiUrl = '/api/v1/auth'; // RUTA DEL PROXY
-  // BehaviorSubject to track login status
-  private loggedIn = new BehaviorSubject<boolean>(!!localStorage.getItem('token_ecommerce'));
-  // Observable to track login status
-  isLoggedIn$ = this.loggedIn.asObservable();
+  private readonly http = inject(HttpClient);
+  private readonly url = `${API}/auth`;
+  private readonly account = signal<Account | null>(null);
+  readonly user = this.account.asReadonly();
 
-  // LOGIN - PROCESO DE AUTENTICACIÓN
-  login(credentials: { usuario: string; password: string }): Observable<boolean> {
-    return this.http.post<ILoginResponse>(`${this.apiUrl}/login`, credentials).pipe (
-      tap(reponse => {
-        if (reponse && reponse.token) {
-          // Store the token and user information in localStorage
-          localStorage.setItem('token_ecommerce', reponse.token);
-          localStorage.setItem('user_id_persona', reponse.idPersona.toString());
-          localStorage.setItem('user_role', reponse.rol);
-          localStorage.setItem('user_name', reponse.usuario);
-          // Update the loggedIn BehaviorSubject to true
-          this.loggedIn.next(true);
-          this.router.navigate(['/home']);
-        }
-  }),
-  // Map the response to a boolean indicating success
-  map(response => !!response.token),
-  catchError(() => {
-    this.logout(); // Clear any existing session data on error
-    return of(false);
-  })
-);
-}
-// LOGOUT - PROCESO DE CIERRE DE SESIÓN
-logout(): void {
-  localStorage.clear();
-  this.loggedIn.next(false);
-  this.router.navigate(['/login']);
-}
-// Get the token from localStorage
-getToken(): string | null {
-  return localStorage.getItem('token_ecommerce');
-}
-// REGISTRO - PROCESO DE REGISTRO DE USUARIO
-registrar(datos:any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/registro`, datos);
-}
+  constructor() {
+    for (const key of ['token_ecommerce', 'user_id_persona', 'user_role', 'user_name']) {
+      localStorage.removeItem(key);
+    }
+  }
+
+  session(): Observable<Account | null> {
+    return this.http.get<Account | null>(`${this.url}/session`).pipe(
+      tap(account => this.account.set(account)),
+      catchError(() => of(this.account()))
+    );
+  }
+
+  login(usuario: string, password: string): Observable<Account> {
+    return this.csrf().pipe(
+      switchMap(() => this.http.post<Account>(`${this.url}/login`, { usuario, password })),
+      tap(account => this.account.set(account))
+    );
+  }
+
+  register(data: Registration): Observable<unknown> {
+    return this.csrf().pipe(switchMap(() => this.http.post(`${this.url}/registro`, data)));
+  }
+
+  logout(): Observable<void> {
+    return this.csrf().pipe(
+      switchMap(() => this.http.post<void>(`${this.url}/logout`, null)),
+      tap(() => this.expire())
+    );
+  }
+
+  expire(): void {
+    this.account.set(null);
+  }
+
+  private csrf(): Observable<void> {
+    return this.http.get<void>(`${this.url}/csrf`);
+  }
 }

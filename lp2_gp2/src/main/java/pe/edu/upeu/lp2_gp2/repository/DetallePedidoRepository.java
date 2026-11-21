@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
+    boolean existsByProductoIdProducto(Long idProducto);
     List<DetallePedido> findByPedidoIdPedido(Long idPedido);
 
 }

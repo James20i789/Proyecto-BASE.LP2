@@ -1,16 +1,11 @@
 package pe.edu.upeu.lp2_gp2.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
+import jakarta.validation.constraints.Positive;
 
 public record ItemVentaDTO(
-        @NotNull // VALIDATION - NULA
-        Long idProducto,
-        @Min(1) // VALIDATION - MIN
-        Integer cantidad
-
-
-) {
-}
+        @NotNull @Positive Long idProducto,
+        @NotNull @Min(1) @Max(99) Integer cantidad
+) {}

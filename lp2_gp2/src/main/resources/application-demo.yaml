@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:lp2demo;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: ${SESSION_COOKIE_SECURE:false}

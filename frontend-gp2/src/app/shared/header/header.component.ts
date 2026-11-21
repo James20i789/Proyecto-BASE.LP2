@@ -1,40 +1,34 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { CartService } from '../../core/services/cart.service';
-import { RegisterComponent } from '../../features/register/register.component';
-import { LoginComponent } from '../../features/login/login.component';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { CartService } from '../../core/services/cart.service';
+import { AlertService } from '../../core/services/alert.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule,RouterLink, LoginComponent, RegisterComponent],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit {
-  public cartService = inject(CartService);
-  public authService = inject(AuthService);
-  userName: String = '';
-  isAdmin: boolean = false;
+  readonly cart = inject(CartService);
+  readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly alerts = inject(AlertService);
+  readonly signingOut = signal(false);
 
-  // Implementación del método ngOnInit para suscribirse al estado de inicio de sesión
   ngOnInit(): void {
-    this.authService.isLoggedIn$.subscribe(isLoggedIn => {
-      if (isLoggedIn) {
-        // Recuperar el nombre de usuario y el rol del usuario desde localStorage
-        this.userName = localStorage.getItem('user_name') || 'Usuario';
-        this.isAdmin = localStorage.getItem('user_role') === 'ADMIN';
-      } else {
-        this.userName = '';
-        this.isAdmin = false;
-      }
-  })
-  }
-  // Método para cerrar sesión
-  logout(): void {
-    this.authService.logout();
+    this.auth.session().subscribe();
   }
 
+  logout(): void {
+    if (this.signingOut()) return;
+    this.signingOut.set(true);
+    this.auth.logout().pipe(finalize(() => this.signingOut.set(false))).subscribe({
+      next: () => this.router.navigateByUrl('/home'),
+      error: () => this.alerts.toast('No se pudo cerrar la sesión. Inténtalo otra vez.', 'error')
+    });
+  }
 }

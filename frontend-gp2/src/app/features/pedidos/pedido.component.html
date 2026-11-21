@@ -1,0 +1,33 @@
+<section class="site-width page-section order-page">
+  <a class="back-link" routerLink="/pedidos">Mis pedidos</a>
+  @if (order(); as current) {
+    <div class="panel order-detail">
+      <span class="state-pill" [class.paid]="current.estado === 'PAGADO'" aria-live="polite">{{ labels[current.estado] }}</span>
+      <h1 class="page-title">Pedido #{{ current.idPedido }}</h1>
+      <p class="text-soft">{{ description(current) }}</p>
+      <ul class="order-lines">
+        @for (item of current.productos; track $index) {
+          <li><span>{{ item.cantidad }} × {{ item.producto }}</span><span>{{ item.subtotal | currency:'PEN':'S/ ' }}</span></li>
+        }
+      </ul>
+      <div class="order-total"><strong>Total</strong><strong>{{ current.total | currency:'PEN':'S/ ' }}</strong></div>
+      @if (error()) { <p class="app-alert" role="alert">{{ error() }}</p> }
+      <div class="order-actions">
+        @if (current.checkoutUrl) {
+          <a class="action primary" [href]="current.checkoutUrl">Continuar en Mercado Pago</a>
+        }
+        @if (current.estado === 'VENCIDO' || current.estado === 'REEMBOLSADO' || current.estadoPago === 'SIN_PREFERENCIA') {
+          <a class="action primary" routerLink="/carrito">Volver al carrito</a>
+        }
+        <button class="action secondary" type="button" [disabled]="busy()" (click)="reload()">Actualizar estado</button>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="panel empty-state" role="alert">
+      <p>{{ error() }}</p>
+      <button class="action secondary" type="button" [disabled]="busy()" (click)="reload()">Volver a intentar</button>
+    </div>
+  } @else {
+    <div class="panel empty-state" role="status">Consultando el pedido…</div>
+  }
+</section>

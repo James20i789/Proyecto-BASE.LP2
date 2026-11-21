@@ -1,68 +1,40 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../core/services/auth.service';
-import { AlertService } from '../../core/services/alert.service';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { accountReturnPath } from '../../core/account.guard';
+import { Registration } from '../../core/Interfaces/auth.interface';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  imports: [FormsModule, RouterLink],
+  templateUrl: './register.component.html'
 })
 export class RegisterComponent {
-  private authService = inject(AuthService);
-  private alertService = inject(AlertService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  readonly returnPath = accountReturnPath(inject(ActivatedRoute).snapshot.queryParamMap.get('volver'));
+  readonly pending = signal(false);
+  readonly error = signal('');
+  readonly fields = signal<Record<string, string>>({});
+  readonly form: Registration = { nombre: '', usuario: '', email: '', telefono: '', direccion: '', password: '' };
 
-  // DATOS DEL ARREGLO
-  userData = {
-    nombre: '',
-    email: '',
-    telefono: '',
-    direccion: '',
-    usuario: '',
-    password: ''
-  };
-
-  isloading = false;
-  // MÉTODO PARA REGISTRAR UN NUEVO USUARIO
-  registrar():void {
-    if(this.isloading) return; // Evitar múltiples solicitudes si ya se está cargando
-    this.isloading = true; // Indicar que se está cargando
-
-    this.authService.registrar(this.userData)
-    .pipe(finalize(() => this.isloading = false)) // Finalizar la carga después de la respuesta
-    .subscribe({
-      // Manejar la respuesta del registro
-      next: () => {
-        // (1) CERRAR EL MODAL DE REGISTRO
-        document.getElementById('CloseRegisterModal')?.click(); // Cerrar el modal de registro
-        // (2) MOSTRAR MENSAJE DE ÉXITO - ALERTA
-        this.alertService.success('¡Registro exitoso! Ahora puedes iniciar sesión.', 'success'); // Mostrar mensaje de éxito
-      // (3) ABRIR EL MODAL DE INICIO DE SESIÓN DESPUÉS DE UN BREVE RETRASO
-        setTimeout(() => {
-            const btnLogin = document.querySelector('[data-bs-target="#loginModal"]') as HTMLElement;
-            btnLogin?.click;
-          }, 600);
-          this.resetForm();
-        }, error: (err) => {
-          this.alertService.error(err.error.message || 'Error al registrarse');
-        }
-      })
-
+  submit(): void {
+    if (this.pending()) return;
+    this.pending.set(true);
+    this.error.set('');
+    this.fields.set({});
+    this.auth.register(this.form).pipe(finalize(() => this.pending.set(false))).subscribe({
+      next: () => this.router.navigate(['/login'], {
+        queryParams: { registro: 'ok', volver: this.returnPath }, replaceUrl: true
+      }),
+      error: (error: HttpErrorResponse) => {
+        this.fields.set(error.error?.errors ?? {});
+        this.error.set(error.error?.message || 'No pudimos crear tu cuenta.');
+      }
+    });
   }
-
-  resetForm() {
-    this.userData = {
-      nombre: '',
-      email: '',
-      telefono: '',
-      direccion: '',
-      usuario: '',
-      password: '',
-    }
-  }
-
 }

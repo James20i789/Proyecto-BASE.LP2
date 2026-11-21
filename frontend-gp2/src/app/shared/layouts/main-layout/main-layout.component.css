@@ -1,8 +1,2 @@
-:host{
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-main{
-    flex-grow: 1;
-}
+:host { min-height: 100vh; display: flex; flex-direction: column; }
+.main-content { flex: 1; }

@@ -1,0 +1,18 @@
+.order-page { max-width: 780px; }
+.order-list, .order-lines { margin: 0; padding: 0; list-style: none; }
+.order-list li { display: grid; align-items: center; grid-template-columns: 1fr auto minmax(5.4rem, auto); gap: .8rem; padding: 1rem 1.2rem; }
+.order-list li + li, .order-lines li + li { border-top: 1px solid var(--line); }
+.order-list li a { font-weight: 750; }
+.order-list li small { display: block; color: var(--muted); }
+.order-list li strong { text-align: right; }
+.order-detail { padding: clamp(1.2rem, 5vw, 2.65rem); }
+.order-detail h1 { margin: .75rem 0; }
+.order-lines { border-top: 1px solid var(--line); margin-top: 1.6rem; }
+.order-lines li { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem 0; }
+.order-total { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--line); padding: .8rem 0; font-size: 1.2rem; }
+.back-link { display: inline-block; margin-bottom: 1rem; }
+.order-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+@media (max-width: 510px) {
+  .order-list li { grid-template-columns: 1fr auto; }
+  .order-list li .state-pill { order: 3; justify-self: start; }
+}

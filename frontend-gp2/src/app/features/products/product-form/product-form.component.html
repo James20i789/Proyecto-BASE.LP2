@@ -1,36 +1,39 @@
-<div class="container mt-4">
-  <div class="card shadow">
-    <div class="card-header bg-upeu-primary text-white">
-      <h4>{{ id ? 'Editar' : 'Nuevo' }} Producto</h4> 
-    </div>
-    <div class="card-body">
+<section class="site-width page-section">
+  <div class="panel auth-panel wide">
+    <h1 class="page-title">{{ id ? 'Editar producto' : 'Nuevo producto' }}</h1>
+    @if (loadError()) {
+      <p class="app-alert" role="alert">{{ loadError() }}</p>
+      <a class="action secondary" routerLink="/productos">Volver a productos</a>
+    } @else {
       <form [formGroup]="form" (ngSubmit)="guardar()">
-        <div class="mb-3">
-          <label class="form-label">Nombre</label>
-          <input type="text" formControlName="nombre" class="form-control">
+        <div class="field">
+          <label for="product-name">Nombre</label>
+          <input id="product-name" formControlName="nombre" maxlength="240">
         </div>
-        <div class="mb-3">
-          <label class="form-label">Descripción</label>
-          <textarea formControlName="descripcion" class="form-control"></textarea>
+        <div class="field">
+          <label for="product-description">Descripción</label>
+          <textarea id="product-description" formControlName="descripcion" maxlength="255" rows="3"></textarea>
         </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Precio</label>
-            <input type="number" formControlName="precio" class="form-control"> 
-            <label class="form-label">Stock</label>
-            <input type="number" formControlName="stock" class="form-control">
+        <div class="auth-fields">
+          <div class="field">
+            <label for="product-price">Precio en soles</label>
+            <input id="product-price" type="number" min="0.01" step="0.01" formControlName="precio">
+          </div>
+          <div class="field">
+            <label for="product-stock">Stock</label>
+            <input id="product-stock" type="number" min="0" step="1" formControlName="stock">
           </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Imagen</label>
-          <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
+        <div class="field">
+          <label for="product-photo">Imagen</label>
+          <input id="product-photo" type="file" (change)="onFileSelected($event)" accept="image/jpeg,image/png">
         </div>
-
-        <div class="mt-4">
-          <button type="submit" class="btn btn-primary me-2" [disabled]="form.invalid">Guardar</button>
-          <a routerLink="/productos" class="btn btn-secondary">Cancelar</a>
+        @if (error()) { <p class="app-alert" role="alert">{{ error() }}</p> }
+        <div class="form-actions">
+          <button class="action primary" type="submit" [disabled]="busy() || form.invalid">{{ busy() ? 'Guardando…' : 'Guardar' }}</button>
+          <a routerLink="/productos" class="action secondary">Cancelar</a>
         </div>
       </form>
-    </div>
+    }
   </div>
-</div>
+</section>

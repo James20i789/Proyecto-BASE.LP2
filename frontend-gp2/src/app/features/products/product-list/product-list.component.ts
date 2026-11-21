@@ -1,5 +1,6 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProductoService } from '../../../core/services/producto.service';
 import { Producto } from '../../../core/Interfaces/producto.interface';
@@ -8,30 +9,34 @@ import { AlertService } from '../../../core/services/alert.service';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.css'
 })
 export class ProductListComponent implements OnInit {
-  private productoService = inject(ProductoService);
-  private alertService = inject(AlertService);
+  private readonly catalog = inject(ProductoService);
+  private readonly alerts = inject(AlertService);
+  readonly products = signal<Producto[] | null>(null);
+  readonly error = signal(false);
 
-  products: Producto[] = [];
-  ngOnInit(): void {
-    this.listarProductos();
+  ngOnInit(): void { this.listarProductos(); }
+
+  listarProductos(): void {
+    this.error.set(false);
+    this.catalog.getProductos().subscribe({
+      next: data => this.products.set(data),
+      error: () => this.error.set(true)
+    });
   }
-  listarProductos(){
-    this.productoService.getProductos().subscribe
-    (data => this.products=data)
-  }
-  async eliminar(id:number){
-    const confirmado = await this.alertService.confirm('Esta accion no se puede deshacer. ¿Desea continuar?');
-    if (confirmado) return;
-    this.productoService.deleteProducto(id).subscribe({
+
+  async eliminar(product: Producto): Promise<void> {
+    if (!product.id || !await this.alerts.confirm(`¿Eliminar «${product.nombre}» de la carta?`)) return;
+    this.catalog.deleteProducto(product.id).subscribe({
       next: () => {
-        this.alertService.toast('Producto eliminado con éxito');
+        this.alerts.toast('Producto eliminado');
         this.listarProductos();
-      }, error: () => this.alertService.error('Ocurrió un error al eliminar el producto')
+      },
+      error: (error: HttpErrorResponse) => this.alerts.error(error.error?.message || 'No se pudo eliminar el producto.')
     });
   }
 }

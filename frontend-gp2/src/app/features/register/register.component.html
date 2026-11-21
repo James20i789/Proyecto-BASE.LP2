@@ -1,71 +1,52 @@
-<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-
-            <div class="modal-header bg-upeu-primary text-white">
-                <h5 class="modal-title">Crear Cuenta Nueva</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    id="closeRegisterModal"></button>
-            </div>
-
-            <div class="modal-body p-4">
-                <form (ngSubmit)="registrar()" #regForm="ngForm">
-                    <div class="row">
-                        <!-- Datos Personales -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" [(ngModel)]="userData.nombre" name="nombre"
-                                required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" [(ngModel)]="userData.email" name="email" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Teléfono (9 dígitos)</label>
-                            <input type="text" class="form-control" [(ngModel)]="userData.telefono" name="telefono"
-                                pattern="9\d{8}" required #tel="ngModel">
-                            @if (tel.invalid && tel.touched) {
-                            <small class="text-danger">Debe empezar con 9 y tener 9 dígitos</small>
-                            }
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Dirección</label>
-                            <input type="text" class="form-control" [(ngModel)]="userData.direccion" name="direccion">
-                        </div>
-
-                        <hr class="my-3">
-
-                        <!-- Credenciales -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nombre de Usuario</label>
-                            <input type="text" class="form-control" [(ngModel)]="userData.usuario" name="usuario"
-                                required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" [(ngModel)]="userData.password" name="password"
-                                required minlength="6">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2 mt-3"
-                        [disabled]="regForm.invalid || isloading">
-                        {{ isloading ? 'Procesando...' : 'Registrarme ahora' }}
-                    </button>
-                </form>
-            </div>
-
-            <!-- ... dentro del modal-footer del registro ... -->
-            <div class="modal-footer justify-content-center border-0">
-                <p class="text-muted small">
-                    ¿Ya tienes cuenta?
-                    <a href="javascript:void(0)" class="text-upeu-primary fw-bold" data-bs-toggle="modal"
-                        data-bs-target="#loginModal">
-                        Inicia sesión aquí
-                    </a>
-                </p>
-            </div>
+<section class="site-width page-section">
+  <div class="panel auth-panel wide">
+    <h1 class="page-title">Crear cuenta</h1>
+    <p class="text-soft">Regístrate para pagar y consultar tus pedidos.</p>
+    <form #registration="ngForm" (ngSubmit)="registration.valid && submit()">
+      <div class="auth-fields">
+        <div class="field">
+          <label for="reg-name">Nombre y apellidos</label>
+          <input id="reg-name" name="nombre" autocomplete="name" [(ngModel)]="form.nombre" maxlength="100" required>
+          @if (fields()['nombre']; as message) { <small class="field-error">{{ message }}</small> }
         </div>
-    </div>
-</div>
+        <div class="field">
+          <label for="reg-user">Usuario</label>
+          <input id="reg-user" name="usuario" autocomplete="username" [(ngModel)]="form.usuario" required
+            minlength="4" maxlength="20" pattern="[a-zA-Z0-9_.\-]+" #user="ngModel">
+          @if (fields()['usuario']; as message) { <small class="field-error">{{ message }}</small> }
+          @else if (user.dirty && user.invalid) { <small class="field-error">Usa de 4 a 20 letras, números, puntos o guiones.</small> }
+        </div>
+        <div class="field">
+          <label for="reg-email">Correo electrónico</label>
+          <input id="reg-email" type="email" name="email" autocomplete="email" [(ngModel)]="form.email" email maxlength="254" required #email="ngModel">
+          @if (fields()['email']; as message) { <small class="field-error">{{ message }}</small> }
+          @else if (email.dirty && email.invalid) { <small class="field-error">Ingresa un correo válido.</small> }
+        </div>
+        <div class="field">
+          <label for="reg-phone">Celular</label>
+          <input id="reg-phone" type="tel" inputmode="tel" name="telefono" autocomplete="tel-national" [(ngModel)]="form.telefono"
+            pattern="9[0-9]{8}" maxlength="9" required #phone="ngModel">
+          @if (fields()['telefono']; as message) { <small class="field-error">{{ message }}</small> }
+          @else if (phone.dirty && phone.invalid) { <small class="field-error">Ingresa 9 dígitos empezando por 9.</small> }
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-address">Dirección (opcional)</label>
+        <input id="reg-address" name="direccion" autocomplete="street-address" [(ngModel)]="form.direccion" maxlength="255">
+        @if (fields()['direccion']; as message) { <small class="field-error">{{ message }}</small> }
+      </div>
+      <div class="field">
+        <label for="reg-password">Contraseña</label>
+        <input id="reg-password" type="password" name="password" autocomplete="new-password" [(ngModel)]="form.password"
+          required minlength="12" maxlength="72" aria-describedby="password-hint">
+        <small id="password-hint">Usa al menos 12 caracteres.</small>
+        @if (fields()['password']; as message) { <small class="field-error">{{ message }}</small> }
+      </div>
+      @if (error()) { <p class="app-alert" role="alert">{{ error() }}</p> }
+      <button class="action primary" type="submit" [disabled]="pending() || registration.invalid">
+        {{ pending() ? 'Creando cuenta…' : 'Crear cuenta' }}
+      </button>
+    </form>
+    <p class="auth-foot">¿Ya tienes cuenta? <a routerLink="/login" [queryParams]="{ volver: returnPath }">Iniciar sesión</a></p>
+  </div>
+</section>
